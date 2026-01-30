@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 
 export const Signup = () => {
     const navigate = useNavigate();
-    const { login } = useAuthStore();
+    const { signup } = useAuthStore();
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -29,7 +29,7 @@ export const Signup = () => {
                 avatar: `https://ui-avatars.com/api/?name=${name}&background=random`
             };
 
-            login(newUser);
+            signup(newUser);
             navigate('/dashboard');
             setLoading(false);
         }, 1000);

@@ -60,7 +60,7 @@ export const About = () => {
                             <div className="space-y-8">
                                 <div className="h-80 rounded-[3rem] bg-slate-200 dark:bg-slate-800 overflow-hidden shadow-premium group">
                                     <img
-                                        src="https://images.unsplash.com/photo-1581578731522-fb4025d5904a?auto=format&fit=crop&q=80&w=800"
+                                        src="https://images.unsplash.com/photo-1584622050111-9f2012275de5?auto=format&fit=crop&q=80&w=800"
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                         alt="Service"
                                     />

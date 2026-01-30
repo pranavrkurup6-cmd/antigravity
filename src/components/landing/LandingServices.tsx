@@ -6,8 +6,8 @@ import { Link } from 'react-router-dom';
 const services = [
     { name: 'Plumbing', icon: Droplets, color: 'text-blue-400', bgi: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&q=80&w=800' },
     { name: 'Electrical', icon: Zap, color: 'text-amber-400', bgi: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Cleaning', icon: Star, color: 'text-indigo-400', bgi: 'https://images.unsplash.com/photo-1581578731522-fb4025d5904a?auto=format&fit=crop&q=80&w=800' },
-    { name: 'Repairs', icon: Wrench, color: 'text-emerald-400', bgi: 'https://images.unsplash.com/photo-1544724569-5f546fa6622d?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Cleaning', icon: Star, color: 'text-indigo-400', bgi: 'https://images.unsplash.com/photo-1584622050111-9f2012275de5?auto=format&fit=crop&q=80&w=800' },
+    { name: 'Repairs', icon: Wrench, color: 'text-emerald-400', bgi: 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&q=80&w=800' },
 ];
 
 export const LandingServices = () => {

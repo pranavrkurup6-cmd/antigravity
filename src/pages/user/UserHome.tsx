@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { Card } from '../../components/ui/Card';
 import { motion } from 'framer-motion';
@@ -18,7 +18,15 @@ import {
 } from 'lucide-react';
 
 export const UserHome = () => {
-    const { user } = useAuthStore();
+    const { user, isNewUser, resetNewUser } = useAuthStore();
+
+    useEffect(() => {
+        return () => {
+            if (isNewUser) {
+                resetNewUser();
+            }
+        };
+    }, [isNewUser, resetNewUser]);
 
     const services = [
         { icon: Droplets, name: 'Cleaning', desc: 'Deep home cleaning' },
@@ -36,7 +44,9 @@ export const UserHome = () => {
             className="space-y-8"
         >
             <div className="space-y-1">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome back, {user?.name?.split(' ')[0] || 'User'}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                    {isNewUser ? 'Account created successfully' : `Welcome back, ${user?.name?.split(' ')[0] || 'User'}`}
+                </h1>
                 <p className="text-gray-500 dark:text-gray-400">Manage your home services and track upcoming visits.</p>
             </div>
 

@@ -20,10 +20,8 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    credentials: true,
-}));
+// Middleware
+app.use(cors()); // Allow all origins for easier deployment
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

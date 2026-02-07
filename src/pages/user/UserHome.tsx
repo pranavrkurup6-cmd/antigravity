@@ -85,11 +85,20 @@ export const UserHome = () => {
                     <div>
                         <div className="flex items-center justify-between mb-3">
                             <h3 className="font-bold text-gray-900 dark:text-white">Recommended Services</h3>
-                            <button className="text-sm text-primary hover:underline">View All</button>
+                            <button
+                                onClick={() => alert("Services view coming soon!")}
+                                className="text-sm text-primary hover:underline"
+                            >
+                                View All
+                            </button>
                         </div>
                         <div className="space-y-3">
                             {services.map((s, idx) => (
-                                <div key={idx} className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors group">
+                                <div
+                                    key={idx}
+                                    onClick={() => alert(`Selected service: ${s.name}`)}
+                                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors group"
+                                >
                                     <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg group-hover:bg-white dark:group-hover:bg-gray-600 transition-colors">
                                         <s.icon className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                                     </div>

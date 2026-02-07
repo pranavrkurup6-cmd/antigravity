@@ -10,6 +10,7 @@ interface AppState {
     addUser: (user: any) => void;
     updateUser: (id: string, data: any) => void;
     deleteUser: (id: string) => void;
+    setUsers: (users: any[]) => void;
     addLog: (log: any) => void;
 }
 
@@ -33,5 +34,6 @@ export const useAppStore = create<AppState>((set) => ({
         users: state.users.map((u) => (u.id === id ? { ...u, ...data } : u)),
     })),
     deleteUser: (id) => set((state) => ({ users: state.users.filter((u) => u.id !== id) })),
+    setUsers: (users) => set({ users }),
     addLog: (log) => set((state) => ({ logs: [log, ...state.logs] })),
 }));

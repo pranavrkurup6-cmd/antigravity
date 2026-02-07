@@ -7,6 +7,8 @@ import { Input } from '../components/ui/Input';
 import { Mail, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { api } from '../services/api';
+
 export const Login = () => {
     const navigate = useNavigate();
     const { login } = useAuthStore();
@@ -17,16 +19,61 @@ export const Login = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
+        try {
+            // Attempt API Login
+            // Heuristic for role based on email (since UI doesn't have role selector)
+            let roleToTry = 'user';
+            if (email.toLowerCase().includes('admin')) roleToTry = 'admin';
+            // Note: Provider login usually requires role selector or separate portal, checking 'provider' in email for now
+            if (email.toLowerCase().includes('provider')) roleToTry = 'provider';
+
+            const response = await api.login(email, password, roleToTry);
+
+            if (response.success && response.token) {
+                const apiUser = response.user;
+                // Normalize role: API returns lowercase 'admin'/'user'/'provider', Store expects capitalized
+                const mappedRole = apiUser.role === 'admin' ? 'Admin' :
+                    (apiUser.role === 'provider' ? 'ServiceProvider' : 'User');
+
+                const userToStore = { ...apiUser, id: apiUser._id || apiUser.id, role: mappedRole };
+
+                login(userToStore, response.token);
+
+                // Track login
+                addLog({
+                    id: Math.random().toString(),
+                    user: userToStore.name || 'User',
+                    action: 'System Login',
+                    timestamp: new Date().toLocaleString(),
+                });
+
+                if (mappedRole === 'Admin') {
+                    navigate('/admin');
+                } else if (mappedRole === 'ServiceProvider') {
+                    navigate('/provider');
+                } else {
+                    navigate('/dashboard');
+                }
+                setLoading(false);
+                return;
+            }
+        } catch (err: any) {
+            console.log('API Login failed, trying mock fallback...', err);
+            // If API fails, fall back to mock logic (for demo/development if backend is down)
+            // Only fall back if it's a connection error, or just always for now as requested
+        }
+
+        // Mock Fallback Logic
         setTimeout(() => {
             const user = users.find((u) => u.email === email);
 
             if (user) {
-                login(user as any);
+                login(user as any, 'mock-token-' + Math.random());
                 addLog({
                     id: Math.random().toString(),
                     user: user.name,
@@ -40,22 +87,22 @@ export const Login = () => {
                     navigate('/dashboard');
                 }
             } else {
-                // Mock fallback for demo if user not found (or standard failure)
-                // For demo purposes, let's allow "admin@localfix.com" if not in list
+                // Mock fallback for demo
                 if (email === 'admin@localfix.com') {
                     const adminUser = { id: 'admin', name: 'Admin', email, role: 'Admin' as const, avatar: '' };
-                    login(adminUser);
+                    login(adminUser, 'mock-admin-token');
                     navigate('/admin');
-                } else if (email === 'user@localfix.com' || email === 'john@example.com') { // fallback
+                } else if (email === 'user@localfix.com' || email === 'john@example.com') {
                     const normalUser = { id: 'user', name: 'User', email, role: 'User' as const, avatar: '' };
-                    login(normalUser);
+                    login(normalUser, 'mock-user-token');
                     navigate('/dashboard');
                 } else {
-                    setError('Invalid credentials. Try admin@localfix.com');
+                    // If we are here, both API and Mock failed to find the user
+                    setError('Invalid credentials.');
                 }
             }
             setLoading(false);
-        }, 1000); // Fake delay
+        }, 1000);
     };
 
     return (

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../../stores/useAppStore';
+import { useAuthStore } from '../../stores/useAuthStore';
+import { api } from '../../services/api';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
@@ -7,13 +9,54 @@ import { Edit2, Trash2, Plus, Search, Shield, User, MoreVertical, CheckCircle2, 
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const UserManagement = () => {
-    const { users, addUser, updateUser, deleteUser } = useAppStore();
+    const { token } = useAuthStore();
+    const { users, addUser, updateUser, deleteUser, setUsers } = useAppStore();
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<any>(null);
     const [formData, setFormData] = useState({ name: '', email: '', role: 'User' });
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<string | null>(null);
+
+    // Fetch users on mount
+    useEffect(() => {
+        if (token) {
+            const fetchUsers = async () => {
+                try {
+                    const res = await api.getUsers(token);
+                    if (res.success) {
+                        const mappedUsers = [
+                            ...res.users.map((u: any) => ({
+                                id: u._id,
+                                name: u.name,
+                                email: u.email,
+                                role: 'User',
+                                status: 'Active',
+                                joinedDate: u.createdAt || new Date().toISOString(),
+                                avatar: `https://ui-avatars.com/api/?name=${u.name}&background=random`
+                            })),
+                            ...res.providers.map((u: any) => ({
+                                id: u._id,
+                                name: u.name,
+                                email: u.email,
+                                role: 'ServiceProvider', // UI uses strict role types?
+                                status: u.availability === 'available' ? 'Active' : 'Inactive',
+                                joinedDate: u.createdAt || new Date().toISOString(),
+                                avatar: `https://ui-avatars.com/api/?name=${u.name}&background=random`
+                            }))
+                        ];
+                        // Only update if we got data, otherwise keep mock
+                        if (mappedUsers.length > 0) {
+                            setUsers(mappedUsers);
+                        }
+                    }
+                } catch (err) {
+                    console.log('Failed to fetch users, using mock data.', err);
+                }
+            };
+            fetchUsers();
+        }
+    }, [token, setUsers]);
 
     const filteredUsers = users.filter(user =>
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -51,8 +94,17 @@ export const UserManagement = () => {
         setIsDeleteModalOpen(true);
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (userToDelete) {
+            const user = users.find(u => u.id === userToDelete);
+            if (user) {
+                try {
+                    const type = user.role === 'ServiceProvider' ? 'provider' : 'user';
+                    if (token) await api.deleteUser(user.id, type as any, token);
+                } catch (err) {
+                    console.error('API delete failed, falling back to local delete', err);
+                }
+            }
             deleteUser(userToDelete);
             setIsDeleteModalOpen(false);
             setUserToDelete(null);
@@ -225,8 +277,8 @@ export const UserManagement = () => {
                                     key={role}
                                     onClick={() => setFormData({ ...formData, role })}
                                     className={`flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all font-semibold ${formData.role === role
-                                            ? 'border-primary bg-primary/5 text-primary'
-                                            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
+                                        ? 'border-primary bg-primary/5 text-primary'
+                                        : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
                                         }`}
                                 >
                                     {role === 'Admin' ? <Shield className="w-4 h-4" /> : <User className="w-4 h-4" />}

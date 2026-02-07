@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { User, Mail, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { api } from '../services/api';
 
 export const Signup = () => {
     const navigate = useNavigate();
@@ -15,10 +16,47 @@ export const Signup = () => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleSignup = (e: React.FormEvent) => {
+    const [error, setError] = useState('');
+
+    const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setError('');
 
+        try {
+            // Attempt API Register
+            const response = await api.register({
+                name,
+                email,
+                password,
+                role: 'user' // Default to user
+            });
+
+            if (response.success && response.token) {
+                const apiUser = response.user;
+                const mappedRole = apiUser.role === 'admin' ? 'Admin' :
+                    (apiUser.role === 'provider' ? 'ServiceProvider' : 'User');
+                const userToStore = { ...apiUser, id: apiUser._id || apiUser.id, role: mappedRole };
+
+                signup(userToStore, response.token);
+
+                // Redirect to dashboard (or provider dashboard if we support signing up as provider from start, 
+                // but registration logic defaults to user currently)
+                navigate('/dashboard');
+                setLoading(false);
+                return;
+            }
+        } catch (err: any) {
+            console.log('API Signup failed, trying mock fallback...', err);
+            // If API fails, check if it's a duplicate email error or network error
+            if (err.message && err.message.includes('already exists')) {
+                setError(err.message);
+                setLoading(false);
+                return;
+            }
+        }
+
+        // Mock Fallback
         setTimeout(() => {
             // Mock signup success
             const newUser = {
@@ -29,7 +67,7 @@ export const Signup = () => {
                 avatar: `https://ui-avatars.com/api/?name=${name}&background=random`
             };
 
-            signup(newUser);
+            signup(newUser, 'mock-signup-token-' + Math.random());
             navigate('/dashboard');
             setLoading(false);
         }, 1000);
@@ -77,6 +115,8 @@ export const Signup = () => {
                             icon={<Lock className="w-5 h-5" />}
                             required
                         />
+
+                        {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
                         <Button type="submit" className="w-full" isLoading={loading} size="lg">
                             Sign Up

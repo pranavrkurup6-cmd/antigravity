@@ -67,8 +67,8 @@ export const Login = () => {
             >
                 <div className="bg-white dark:bg-dark-card rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800">
                     <div className="text-center mb-8">
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">Welcome Back</h1>
-                        <p className="text-gray-500">Sign in to your account</p>
+                        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">Sign In</h1>
+                        <p className="text-gray-500">Welcome back</p>
                     </div>
 
                     <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm text-blue-800 dark:text-blue-200">

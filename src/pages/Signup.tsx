@@ -45,7 +45,7 @@ export const Signup = () => {
                 <div className="bg-white dark:bg-dark-card rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800">
                     <div className="text-center mb-8">
                         <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">Create Account</h1>
-                        <p className="text-gray-500">Join LocalFix today</p>
+                        <p className="text-gray-500">Create your account to get started</p>
                     </div>
 
                     <form onSubmit={handleSignup} className="space-y-6">
